@@ -54,12 +54,21 @@ const handleNewItemSubmit = function () {
 
     api
       .createItem(newItemName)
-      .then((res) => res.json())
-      .then((newItem) => {
-        store.addItem(newItem);
+      .then((res) => {
+        if(res.ok){
+          return res.json()
+        }
+        throw new Error(res.statusText)})
+
+      .then((jsonData) => {
+        store.addItem(jsonData);
         render();
-      });
-  });
+      })
+
+      .catch(error => {
+        alert(`Something went wrong: ${error.message}`)
+  })
+})
 };
 
 const getItemIdFromElement = function (item) {
@@ -72,15 +81,20 @@ const handleDeleteItemClicked = function () {
     // get the index of the item in store.items
     const id = getItemIdFromElement(event.currentTarget);
     // delete the item
-    api.deleteItem(id).then(
+    api.deleteItem(id)
+    .then(
       () => {
         store.findAndDelete(id);
         render();
       }
+      
       // render the updated shopping list
-    );
+    )
+    .catch(error => {
+      alert('Something went wrong. Try again later.')
   });
-};
+})
+}
 
 const handleEditShoppingItemSubmit = function () {
   $(".js-shopping-list").on("submit", ".js-edit-item", (event) => {
@@ -97,6 +111,8 @@ const handleEditShoppingItemSubmit = function () {
       .then(() => {
         console.log("id is: ", id, "data is :", data);
         store.findAndUpdate(id, data);
+        .catch(error => {
+          alert('Something went wrong. Try again later.')
         render();
       });
   });
@@ -115,10 +131,13 @@ const handleItemCheckClicked = function () {
         console.log("id: ", id, "data: ", data);
         store.findAndUpdate(id, data);
         render();
-      });
+      })
+      .catch(error => {
+        alert('Something went wrong. Try again later.')
     render();
   });
-};
+})
+}
 
 const handleToggleFilterClick = function () {
   $(".js-filter-checked").click(() => {

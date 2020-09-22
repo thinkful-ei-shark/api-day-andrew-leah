@@ -60,7 +60,6 @@ const handleNewItemSubmit = function () {
         render();
       });
 
-    render();
   });
 };
 
@@ -87,15 +86,21 @@ const handleEditShoppingItemSubmit = function () {
     const itemName = $(event.currentTarget)
       .find(".shopping-item")
       .val();
-    store.findAndUpdateName(id, itemName);
-    render();
+    let data = {name: itemName}
+
+    api.updateItem(id, data)
+    .then(res => res.json())
+    .then((id, data) => {
+      store.findAndUpdate(id, data);
+      render();
+    })
   });
 };
 
 const handleItemCheckClicked = function () {
   $(".js-shopping-list").on("click", ".js-item-toggle", (event) => {
     const id = getItemIdFromElement(event.currentTarget);
-    store.findAndToggleChecked(id);
+    //store.findAndToggleChecked(id);
     render();
   });
 };
